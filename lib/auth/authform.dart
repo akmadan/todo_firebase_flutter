@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AuthForm extends StatefulWidget {
@@ -15,6 +18,49 @@ class _AuthFormState extends State<AuthForm> {
   bool isLoginPage = false;
 
   //------------------------------------------
+
+  startauthentication() {
+    final validity = _formkey.currentState.validate();
+    FocusScope.of(context).unfocus();
+
+    if (validity) {
+      _formkey.currentState.save();
+      submitform(_email, _password, _username);
+    }
+  }
+
+  submitform(String email, String password, String username) async {
+    final auth = FirebaseAuth.instance;
+    AuthResult authResult;
+    try {
+      if (isLoginPage) {
+        authResult = await auth.signInWithEmailAndPassword(
+            email: email, password: password);
+      } else {
+        authResult = await auth.createUserWithEmailAndPassword(
+            email: email, password: password);
+        String uid = authResult.user.uid;
+        await Firestore.instance
+            .collection('users')
+            .document(uid)
+            .setData({'username': username, 'email': email});
+      }
+    } on PlatformException catch (err) {
+      var message = 'An error occured';
+      if (err.message != null) {
+        message = err.message;
+      }
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ));
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  //------------------------------------------
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -71,6 +117,7 @@ class _AuthFormState extends State<AuthForm> {
                       ),
                       SizedBox(height: 10),
                       TextFormField(
+                        obscureText: true,
                         keyboardType: TextInputType.emailAddress,
                         key: ValueKey('password'),
                         validator: (value) {
@@ -103,7 +150,21 @@ class _AuthFormState extends State<AuthForm> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10)),
                               color: Theme.of(context).primaryColor,
-                              onPressed: () {}))
+                              onPressed: () {
+                                startauthentication();
+                              })),
+                      SizedBox(height: 10),
+                      Container(
+                        child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                isLoginPage = !isLoginPage;
+                              });
+                            },
+                            child: isLoginPage
+                                ? Text('Not a member?')
+                                : Text('Already a Member?')),
+                      )
                     ],
                   ),
                 ))
