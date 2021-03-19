@@ -69,6 +69,11 @@ class _AuthFormState extends State<AuthForm> {
         child: ListView(
           children: [
             Container(
+              margin: EdgeInsets.all(30),
+              height: 200,
+              child: Image.asset('assets/todo.png'),
+            ),
+            Container(
                 padding: EdgeInsets.only(left: 10, right: 10, top: 10),
                 child: Form(
                   key: _formkey,
@@ -162,8 +167,14 @@ class _AuthFormState extends State<AuthForm> {
                               });
                             },
                             child: isLoginPage
-                                ? Text('Not a member?')
-                                : Text('Already a Member?')),
+                                ? Text(
+                                    'Not a member?',
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 16, color: Colors.white),
+                                  )
+                                : Text('Already a Member?',
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 16, color: Colors.white))),
                       )
                     ],
                   ),

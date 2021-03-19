@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_firebase/auth/authscreen.dart';
 import 'dart:ui';
-
 import 'package:todo_firebase/screens/home.dart';
 
 void main() => runApp(new MyApp());
